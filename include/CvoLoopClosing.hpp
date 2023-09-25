@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <DBoW3/DBoW3.h>
-#include "KeyFrame.hpp"
 #include <UnifiedCvo-0.1/cvo/CvoGPU.hpp>
 #include <UnifiedCvo-0.1/utils/Calibration.hpp>
 
@@ -14,7 +13,7 @@ public:
 
     bool detect_loop(const cv::Mat& kf, int id);
 
-    void print_loop();
+    void print_loop(std::string outFile);
 
     // bool print_loop(unsigned int id);
 

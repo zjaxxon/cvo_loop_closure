@@ -1,5 +1,6 @@
 #include "CvoLoopClosing.hpp"
 #include <iostream>
+#include <fstream>
 
 namespace cvo {
     CvoLoopClosing::CvoLoopClosing(DBoW3::Database* pDB, int numFrame) :
@@ -25,7 +26,7 @@ namespace cvo {
         for (auto r : ret){
           if(currId - r.Id >= frameGap_ && r.Score > 0.055){
             loopsDetect[currId].push_back(r.Id);
-            std::cout << "Loop on index: " << currId << "\n";
+            std::cout << "Loop detected on index: " << currId << "\n";
           }
         }
 
@@ -34,17 +35,19 @@ namespace cvo {
         return true;
     }
 
-    void CvoLoopClosing::print_loop(){
+    // print to file
+    void CvoLoopClosing::print_loop(std::string outFile){
       if(loopsDetect.empty()){
         std::cout << "No Loops Detect.\n";
       }
 
       for (auto v : loopsDetect){
+        std::ofstream ofs(outFile);
         if (!v.second.empty()){
-          std::cout << "Index: " << v.first << " Loops: ";
+          ofs << v.first;
           for (auto idx : v.second)
-             std::cout << idx << " ";
-          std:: cout << "\n";
+             ofs << " " << idx;
+          ofs << "\n";
         }
       }
     }

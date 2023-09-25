@@ -89,9 +89,10 @@ using namespace std;
 //$bin_file $dataset_dir $param_file $seq $method $transform_file
 int main(int argc,char *argv[]) {
 
-    if(!argv[1]){
-        std::cerr << "Not given dataset path\n";
+    if(!argv[1] || !argv[2]){
+        std::cerr << "No options detect\n";
     }
+    std::string outFile = argv[2];
     cvo::KittiHandler kitti(argv[1], cvo::KittiHandler::DataType::STEREO);
     // string cvo_param_file(argv[2]);
     // string calib_file = string(argv[1]) + "/cvo_calib.txt";
@@ -124,7 +125,7 @@ int main(int argc,char *argv[]) {
             
         kitti.next_frame_index();
     }
-    clc.print_loop();
+    clc.print_loop(outFile);
     cout << "... done!\n";
     return 0;
 }
