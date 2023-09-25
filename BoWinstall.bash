@@ -6,4 +6,4 @@ mkdir build
 cd build
 cmake ..
 make -j4
-maek install
+make install
