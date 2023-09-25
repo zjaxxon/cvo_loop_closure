@@ -92,7 +92,8 @@ int main(int argc,char *argv[]) {
     if(!argv[1] || !argv[2]){
         std::cerr << "No options detect\n";
     }
-    std::string outFile = argv[2];
+    std::string vocFile = argv[2];
+    std::string outFile = argv[3];
     cvo::KittiHandler kitti(argv[1], cvo::KittiHandler::DataType::STEREO);
     // string cvo_param_file(argv[2]);
     // string calib_file = string(argv[1]) + "/cvo_calib.txt";
@@ -107,7 +108,7 @@ int main(int argc,char *argv[]) {
     kitti.set_start_index(0);
     int total_iter = kitti.get_total_number();
 
-    DBoW3::Vocabulary voc("/media/e/loop_closing_slam/thirdparty/DBow3/orbvoc.dbow3");
+    DBoW3::Vocabulary voc(vocFile);
     DBoW3::Database db(voc, false, 0);
     cvo::CvoLoopClosing clc(&db, total_iter);
 
