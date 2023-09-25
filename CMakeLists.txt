@@ -30,6 +30,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC UnifiedCvo::cvo_utils_lib
                                              UnifiedCvo::elas
                                              ${Boost_LIBRARIES}
                                              boost_system)
+target_include_directories(${PROJECT_NAME} PUBLIC ${DBoW3_INCLUDE_DIRS})
 
 add_executable(kitti_test ${PROJECT_SOURCE_DIR}/src/kitti_test.cpp)
 target_link_libraries(kitti_test PUBLIC ${PROJECT_NAME}
@@ -37,3 +38,4 @@ target_link_libraries(kitti_test PUBLIC ${PROJECT_NAME}
                                         UnifiedCvo::kitti
                                         ${OpenCV_LIBS}
                                         ${DBoW3_LIBS})
+
