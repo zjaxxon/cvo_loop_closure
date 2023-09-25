@@ -2,64 +2,51 @@
 #include <iostream>
 
 namespace cvo {
-    CvoLoopClosing::CvoLoopClosing(DBoW3::Database* pDB, CvoGPU* cvo, Calibration* calib) : 
-                                                                                            pDB_(pDB), 
-                                                                                            cvo_(cvo), 
-                                                                                            calib_(calib),
-                                                                                            frameGap_(10), 
-                                                                                            minScoreAccept_(0.02) {
-
+    CvoLoopClosing::CvoLoopClosing(DBoW3::Database* pDB, int numFrame) :
+                                                            db(pDB), 
+                                                            frameGap_(10),
+                                                            numFrame_(numFrame){
     }
 
-    bool CvoLoopClosing::detect_loop(const KeyFrame& kf) {
-        // DBoW check
-        DBoW3::QueryResults rets;
-        const cv::Mat& currImg = kf.img_;
-        pDB_->queryImg(currImg, rets,1, pDB_->size() - frameGap_);
-        // simple logic check to filter out unwanted
-        if (rets.empty()) {
-            pDB_->addImg(currImg);
-            histKFs_.push_back(kf);
-            std::cout << "No candidate\n";
-            return false;
-        }
-        DBoW3::Result r = rets[0];
-        if (r.Score < minScoreAccept_) {
-            pDB_->addImg(currImg);
-            histKFs_.push_back(kf);
-            std::cout << "added img\n";
-            return false;
-        }
-        std::cout << "Cur frame: " << pDB_->size() << std::endl;
-        std::cout << r << std::endl;
-        // find initial guess for transform
-        // extract features and match
-        cv::Ptr<cv::ORB> detector = cv::ORB::create();
-        std::vector<cv::KeyPoint> keypointPrev, keypointCurr;
-        const cv::Mat& prevImg = histKFs_[r.Id].img_;
-        cv::Mat descrPrev, descrCurr;
-        detector->detectAndCompute(prevImg, cv::noArray(), keypointPrev, descrPrev);
-        detector->detectAndCompute(currImg, cv::noArray() ,keypointCurr, descrCurr);
-        cv::Ptr<cv::DescriptorMatcher> matcher = cv::DescriptorMatcher::create(cv::DescriptorMatcher::knnMatch());
-        std::vector<std::vector<cv::DMatch>> matches;
-        matcher->knnMatch(descrPrev, descrCurr, matches, 2);
-        float ratioThresh = 0.75f;
-        std::vector<cv::DMatch> goodMatches;
-        for (int i = 0; i < matches.size(); i++) {
-            if (matches[i][0].distance < ratioThresh * matches[i][1].distance)
-                goodMatches.push_back(matches[i][0]);
-        }
-        std::vector<cv::Point2f> prevKps, currKps;
-        for (int i = 0; i < goodMatches.size(); i++) {
-            prevKps.push_back(keypointPrev[goodMatches[i].queryIdx].pt);
-            currKps.push_back(keypointCurr[goodMatches[i].queryIdx].pt);
-        }
-        cv::Mat H = cv::findHomography(prevKps, currKps, cv::RANSAC);
-        cv::Mat K = calib_->intrinsic();
+    bool CvoLoopClosing::detect_loop(const cv::Mat& currImg, int currId) {
+        // feature detection
+        cv::Ptr<cv::ORB> orb = cv::ORB::create();
+        cv::Mat descriptors;
+        std::vector<cv::KeyPoint> kp;
+        orb->detectAndCompute(currImg, cv::Mat(), kp, descriptors);
+        
+        // query the db
+        DBoW3::QueryResults ret;
+        db->query(descriptors, ret, 5);
 
+        // add to db
+        db->add(descriptors);
+
+        for (auto r : ret){
+          if(currId - r.Id >= frameGap_ && r.Score > 0.055){
+            loopsDetect[currId].push_back(r.Id);
+            std::cout << "Loop on index: " << currId << "\n";
+          }
+        }
+
+        if(loopsDetect.empty())
+          return false;
         return true;
     }
 
+    void CvoLoopClosing::print_loop(){
+      if(loopsDetect.empty()){
+        std::cout << "No Loops Detect.\n";
+      }
 
+      for (auto v : loopsDetect){
+        if (!v.second.empty()){
+          std::cout << "Index: " << v.first << " Loops: ";
+          for (auto idx : v.second)
+             std::cout << idx << " ";
+          std:: cout << "\n";
+        }
+      }
+    }
     
 } //namespace cvo

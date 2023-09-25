@@ -7,20 +7,22 @@
 #include <UnifiedCvo-0.1/utils/Calibration.hpp>
 
 
-
 namespace cvo {
 class CvoLoopClosing {
 public:
-    CvoLoopClosing(DBoW3::Database* pDB, cvo::CvoGPU* cvo, cvo::Calibration* calib);
+    CvoLoopClosing(DBoW3::Database* pDB, int numFrame);
 
-    bool detect_loop(const KeyFrame& kf);
+    bool detect_loop(const cv::Mat& kf, int id);
+
+    void print_loop();
+
+    // bool print_loop(unsigned int id);
 
 private:
-    DBoW3::Database* pDB_;
-    unsigned int frameGap_; // We consider frames within this range as too close
-    float minScoreAccept_; // Disregard ones lower than this
-    std::vector<KeyFrame> histKFs_;
-    cvo::CvoGPU* cvo_;
-    cvo::Calibration* calib_;
+    DBoW3::Database* db;
+    int numFrame_;
+    int frameGap_; // We consider frames within this range as too close
+    int numDetect_;
+    std::unordered_map<int, std::vector<int>> loopsDetect;
 };
 } //namespace cvo

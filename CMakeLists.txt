@@ -26,8 +26,8 @@ add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCE_DIR}/src/CvoLoopClosing.cpp
                                    ${PROJECT_SOURCE_DIR}/src/KeyFrame.cpp)
 target_link_libraries(${PROJECT_NAME} PUBLIC UnifiedCvo::cvo_utils_lib
                                              UnifiedCvo::lie_group_utils
-                                             UnifiedCvo::cvo_gpu_img_lib 
-                                             UnifiedCvo::cvo_irls_lib
+                                             UnifiedCvo::cvo_gpu_img
+#                                             UnifiedCvo::cvo_irls_lib
                                              UnifiedCvo::elas
                                              ${Boost_LIBRARIES}
                                              boost_system)
