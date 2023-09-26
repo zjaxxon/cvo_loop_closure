@@ -41,8 +41,8 @@ namespace cvo {
         std::cout << "No Loops Detect.\n";
       }
 
+      std::ofstream ofs(outFile);
       for (auto v : loopsDetect){
-        std::ofstream ofs(outFile);
         if (!v.second.empty()){
           ofs << v.first;
           for (auto idx : v.second)
@@ -50,6 +50,7 @@ namespace cvo {
           ofs << "\n";
         }
       }
+      ofs.close()
     }
     
 } //namespace cvo
