@@ -5,7 +5,7 @@
 namespace cvo {
     CvoLoopClosing::CvoLoopClosing(DBoW3::Database* pDB, int numFrame) :
                                                             db(pDB), 
-                                                            frameGap_(10),
+                                                            frameGap_(30),
                                                             numFrame_(numFrame){
     }
 
@@ -18,13 +18,13 @@ namespace cvo {
         
         // query the db
         DBoW3::QueryResults ret;
-        db->query(descriptors, ret, 5);
+        db->query(descriptors, ret, 50);
 
         // add to db
         db->add(descriptors);
 
         for (auto r : ret){
-          if(currId - r.Id >= frameGap_ && r.Score > 0.055){
+          if(currId - r.Id >= frameGap_ && r.Score > 0.05){ // 0.055
             loopsDetect[currId].push_back(r.Id);
             std::cout << "Loop detected on index: " << currId << "\n";
           }
