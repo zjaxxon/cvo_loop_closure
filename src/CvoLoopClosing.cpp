@@ -50,7 +50,7 @@ namespace cvo {
           ofs << "\n";
         }
       }
-      ofs.close()
+      ofs.close();
     }
     
 } //namespace cvo
